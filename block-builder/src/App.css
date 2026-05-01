@@ -393,6 +393,134 @@
   justify-content: center;
 }
 
+/* ─── Journey Builder page ───────────────────────────────────────── */
+.jb-page {
+  flex: 1;
+  align-self: stretch;
+  overflow: auto;
+  padding: 28px 32px;
+  box-sizing: border-box;
+}
+
+.jb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.jb-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -.01em;
+}
+
+.jb-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jb-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-border);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--text-muted);
+  height: 36px;
+}
+
+.jb-search__input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-size: 13px;
+  width: 200px;
+}
+.jb-search__input::placeholder { color: var(--text-dim); }
+
+.jb-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  background: transparent;
+  border: 1.5px solid var(--bg-border);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.jb-add-btn:hover { background: var(--bg-border); border-color: var(--text-muted); }
+
+.jb-table-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.jb-table { width: 100%; border-collapse: collapse; }
+
+.jb-th {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--bg-border) 40%, var(--bg-surface));
+  border-bottom: 1px solid var(--bg-border);
+  text-align: left;
+  white-space: nowrap;
+}
+.jb-th--icon { width: 40px; padding: 10px 0 10px 12px; }
+
+.jb-row { border-bottom: 1px solid var(--bg-border); transition: background 0.1s; }
+.jb-row:last-child { border-bottom: none; }
+.jb-row:hover { background: color-mix(in srgb, var(--accent) 5%, var(--bg-surface)); }
+.jb-row--selected { background: color-mix(in srgb, var(--accent) 8%, var(--bg-surface)); }
+
+.jb-td { padding: 11px 14px; font-size: 13px; color: var(--text-sub); vertical-align: middle; }
+.jb-td--icon  { width: 40px; padding: 11px 0 11px 12px; }
+.jb-td--muted { color: var(--text-muted); }
+.jb-td--empty { text-align: center; color: var(--text-dim); padding: 36px 14px; }
+
+.jb-icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  background: transparent; border: none;
+  color: var(--text-dim); cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.12s, background 0.12s;
+}
+.jb-icon-btn:hover { color: var(--text-sub); background: var(--bg-border); }
+
+.jb-name { color: var(--accent); cursor: pointer; transition: opacity 0.12s; }
+.jb-name:hover { opacity: 0.75; text-decoration: underline; }
+
+.jb-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.jb-badge--published { background: color-mix(in srgb, #22c55e 18%, transparent); color: #4ade80; }
+.jb-badge--archived  { background: color-mix(in srgb, var(--bg-border) 80%, transparent); color: var(--text-muted); }
+
+/* ─── Content placeholder ────────────────────────────────────────── */
 .content-placeholder {
   display: flex;
   flex-direction: column;

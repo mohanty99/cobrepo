@@ -11,6 +11,7 @@ import Profile from './pages/Profile'
 import UserGuide from './pages/UserGuide'
 import ManagementHome from './pages/management/ManagementHome'
 import ManagementSubPage from './pages/management/ManagementSubPage'
+import JourneyBuilder from './pages/management/journey/Builder'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="guide"      element={<UserGuide />} />
           <Route path="management">
             <Route index element={<ManagementHome />} />
+            <Route path="journey/builder" element={<JourneyBuilder />} />
             <Route path=":sectionId/:pageSlug" element={<ManagementSubPage />} />
           </Route>
         </Route>
