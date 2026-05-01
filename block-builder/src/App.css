@@ -372,6 +372,11 @@
   text-decoration: underline;
 }
 
+.subnav-link--active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .subnav-section__divider {
   height: 1px;
   background: var(--bg-border);
