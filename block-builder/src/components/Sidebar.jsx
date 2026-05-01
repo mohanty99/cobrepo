@@ -23,8 +23,9 @@ export default function Sidebar({ open, onToggle }) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const segment  = '/' + location.pathname.split('/')[1]
-  const inMgmt   = location.pathname.startsWith('/management')
+  const segment    = '/' + location.pathname.split('/')[1]
+  const inMgmt     = location.pathname.startsWith('/management')
+  const mgmtPanelOpen = location.pathname === '/management'
 
   return (
     <aside className={`sidebar${open ? '' : ' sidebar--collapsed'}`}>
@@ -58,7 +59,7 @@ export default function Sidebar({ open, onToggle }) {
             label={label}
             Icon={Icon}
             active={hasSubNav ? inMgmt : segment === path}
-            subNavOpen={hasSubNav && inMgmt}
+            subNavOpen={hasSubNav && mgmtPanelOpen}
             onClick={() => navigate(path)}
           />
         ))}

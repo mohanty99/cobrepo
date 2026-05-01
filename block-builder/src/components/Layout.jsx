@@ -11,7 +11,7 @@ export default function Layout() {
   const [themeId, setThemeId] = useTheme()
   const location = useLocation()
 
-  const subNavData = location.pathname.startsWith('/management')
+  const subNavData = location.pathname === '/management'
     ? SUBNAV_DATA.management
     : null
 
