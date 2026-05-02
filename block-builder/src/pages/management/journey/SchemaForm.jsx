@@ -1,8 +1,8 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, Fragment } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const TABS       = ['Details', 'Journey', 'Scoping', 'Event Triggers', 'Milestones', 'SLA Configuration']
-const PROP_TABS  = ['Details', 'Scoping Conditions', 'SLA Configuration']
+const TABS      = ['Details', 'Journey', 'Scoping', 'Event Triggers', 'Milestones', 'SLA Configuration']
+const PROP_TABS = ['Details', 'Scoping Conditions', 'SLA Configuration']
 
 const JOURNEY_TYPES = [
   'Agency Request', 'Client Onboarding', 'Client Offboarding', 'Client ReOnboarding',
@@ -10,8 +10,22 @@ const JOURNEY_TYPES = [
 ]
 const CHANNEL_TYPES = ['Internal', 'External', 'Portal']
 
+const newStage = () => ({
+  id: crypto.randomUUID(),
+  title: 'Stage',
+  description: '',
+  datakey: '',
+  processCompletionOrder: 'Sequential',
+})
+
+const PlusIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+)
+
 /* ── Stage Properties side-panel ─────────────────────────────────── */
-function StageProperties({ stageId, stageTitle, onTitleChange, onClose }) {
+function StageProperties({ stage, onUpdate, onClose }) {
   const [propTab, setPropTab] = useState('Details')
 
   return (
@@ -19,8 +33,7 @@ function StageProperties({ stageId, stageTitle, onTitleChange, onClose }) {
       <div className="sf-props__header">
         <span className="sf-props__title">Stage Properties</span>
         <button className="sf-props__close" onClick={onClose}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-            strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
@@ -28,8 +41,7 @@ function StageProperties({ stageId, stageTitle, onTitleChange, onClose }) {
 
       <div className="sf-props__tabs">
         {PROP_TABS.map(t => (
-          <button
-            key={t}
+          <button key={t}
             className={`sf-props__tab${propTab === t ? ' sf-props__tab--active' : ''}`}
             onClick={() => setPropTab(t)}
           >{t}</button>
@@ -41,29 +53,29 @@ function StageProperties({ stageId, stageTitle, onTitleChange, onClose }) {
           <div className="sf-props-grid">
             <div className="sf-props-field">
               <label className="sf-props-label">Stage ID <span className="sf-req">*</span></label>
-              <textarea className="sf-props-input sf-props-textarea" readOnly value={stageId} />
+              <textarea className="sf-props-input sf-props-textarea" readOnly value={stage.id} />
             </div>
             <div className="sf-props-field">
               <label className="sf-props-label">Title <span className="sf-req">*</span></label>
-              <input
-                className="sf-props-input"
-                value={stageTitle}
-                onChange={e => onTitleChange(e.target.value)}
-              />
+              <input className="sf-props-input" value={stage.title}
+                onChange={e => onUpdate('title', e.target.value)} />
             </div>
             <div className="sf-props-field">
               <label className="sf-props-label">Description</label>
-              <input className="sf-props-input" />
+              <input className="sf-props-input" value={stage.description}
+                onChange={e => onUpdate('description', e.target.value)} />
             </div>
             <div className="sf-props-field">
               <label className="sf-props-label">Stage Datakey</label>
-              <input className="sf-props-input" />
+              <input className="sf-props-input" value={stage.datakey}
+                onChange={e => onUpdate('datakey', e.target.value)} />
             </div>
           </div>
           <div className="sf-props-field sf-props-field--solo">
             <label className="sf-props-label">Process Completion Order</label>
             <div className="sf-select-wrap sf-props-select-wrap">
-              <select className="sf-select">
+              <select className="sf-select" value={stage.processCompletionOrder}
+                onChange={e => onUpdate('processCompletionOrder', e.target.value)}>
                 <option>Sequential</option>
                 <option>Parallel</option>
               </select>
@@ -79,9 +91,9 @@ function StageProperties({ stageId, stageTitle, onTitleChange, onClose }) {
 
 /* ── Journey canvas ───────────────────────────────────────────────── */
 function JourneyCanvas({
-  started, onStart, onDelete, pan, setPan, hidden,
-  stageTitle, onStageTitleChange,
-  stageSelected, setStageSelected, stageId,
+  started, onStart, pan, setPan, hidden,
+  stages, selectedStageId, setSelectedStageId,
+  onAddStage, onDeleteStage, onStageUpdate,
 }) {
   const [dragging, setDragging] = useState(false)
   const dragOrigin               = useRef(null)
@@ -100,9 +112,7 @@ function JourneyCanvas({
 
   const onMouseUp = useCallback(() => setDragging(false), [])
 
-  const handleCanvasClick = e => {
-    if (e.target === e.currentTarget) setStageSelected(false)
-  }
+  const selectedStage = stages.find(s => s.id === selectedStageId)
 
   return (
     <div
@@ -112,7 +122,6 @@ function JourneyCanvas({
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseUp}
-      onClick={handleCanvasClick}
     >
       {/* fixed toolbar */}
       <div className="sf-canvas-toolbar" onMouseDown={e => e.stopPropagation()}>
@@ -163,63 +172,61 @@ function JourneyCanvas({
       <div
         className="sf-canvas-inner"
         style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}
+        onClick={() => setSelectedStageId(null)}
       >
         {started ? (
-          <div className="sf-stage-row" onMouseDown={e => e.stopPropagation()}>
-            {/* add stage before — only when selected */}
-            {stageSelected && (
-              <button className="sf-stage-add" title="Add stage before">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-              </button>
-            )}
+          <div className="sf-stage-row" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
+            {stages.map((stage, i) => {
+              const isSelected = selectedStageId === stage.id
+              const isLast     = i === stages.length - 1
+              return (
+                <Fragment key={stage.id}>
+                  {i > 0 && <div className="sf-connector" />}
 
-            {/* stage block */}
-            <div
-              className={`sf-stage${stageSelected ? ' sf-stage--selected' : ''}`}
-              onClick={() => setStageSelected(true)}
-            >
-              <div className="sf-stage__header">
-                <span className="sf-stage__label">{stageTitle}</span>
-                {stageSelected && (
-                  <button
-                    className="sf-stage__delete"
-                    title="Delete stage"
-                    onMouseDown={e => e.stopPropagation()}
-                    onClick={e => { e.stopPropagation(); onDelete() }}
+                  {isSelected && (
+                    <button className="sf-stage-add" title="Add stage before" onClick={() => onAddStage(i)}>
+                      <PlusIcon />
+                    </button>
+                  )}
+
+                  <div
+                    className={`sf-stage${isSelected ? ' sf-stage--selected' : ''}`}
+                    onClick={() => setSelectedStageId(stage.id)}
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                      <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-                    </svg>
-                  </button>
-                )}
-              </div>
-              <div className="sf-process" onClick={e => e.stopPropagation()}>
-                <span className="sf-process__label">Process</span>
-                <div className="sf-task">
-                  <span className="sf-task__dot" />
-                  <span className="sf-task__name">Task</span>
-                </div>
-              </div>
-            </div>
+                    <div className="sf-stage__header">
+                      <span className="sf-stage__label">{stage.title}</span>
+                      {isSelected && (
+                        <button className="sf-stage__delete" title="Delete stage"
+                          onMouseDown={e => e.stopPropagation()}
+                          onClick={e => { e.stopPropagation(); onDeleteStage(stage.id) }}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                            <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    <div className="sf-process" onClick={e => e.stopPropagation()}>
+                      <span className="sf-process__label">Process</span>
+                      <div className="sf-task">
+                        <span className="sf-task__dot" />
+                        <span className="sf-task__name">Task</span>
+                      </div>
+                    </div>
+                  </div>
 
-            {/* add stage after — only when selected */}
-            {stageSelected && (
-              <button className="sf-stage-add" title="Add stage after">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-              </button>
-            )}
+                  {isSelected && isLast && (
+                    <button className="sf-stage-add" title="Add stage after" onClick={() => onAddStage(stages.length)}>
+                      <PlusIcon />
+                    </button>
+                  )}
+                </Fragment>
+              )
+            })}
           </div>
         ) : (
-          <button
-            className="sf-start-btn"
-            onMouseDown={e => e.stopPropagation()}
-            onClick={onStart}
-          >
+          <button className="sf-start-btn" onMouseDown={e => e.stopPropagation()} onClick={onStart}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
             </svg>
@@ -228,13 +235,11 @@ function JourneyCanvas({
         )}
       </div>
 
-      {/* stage properties panel — fixed to canvas, not pannable */}
-      {stageSelected && (
+      {selectedStage && (
         <StageProperties
-          stageId={stageId}
-          stageTitle={stageTitle}
-          onTitleChange={onStageTitleChange}
-          onClose={() => setStageSelected(false)}
+          stage={selectedStage}
+          onUpdate={(field, value) => onStageUpdate(selectedStage.id, field, value)}
+          onClose={() => setSelectedStageId(null)}
         />
       )}
     </div>
@@ -243,13 +248,14 @@ function JourneyCanvas({
 
 /* ── Schema Form page ─────────────────────────────────────────────── */
 export default function SchemaForm() {
-  const navigate = useNavigate()
-  const [activeTab,      setActiveTab]      = useState('Details')
-  const [journeyStarted, setJourneyStarted] = useState(false)
-  const [journeyPan,     setJourneyPan]     = useState({ x: 0, y: 0 })
-  const [stageTitle,     setStageTitle]     = useState('Stage')
-  const [stageSelected,  setStageSelected]  = useState(false)
-  const [stageId]                           = useState(() => crypto.randomUUID())
+  const navigate    = useNavigate()
+  const importRef   = useRef(null)
+
+  const [activeTab,       setActiveTab]       = useState('Details')
+  const [journeyStarted,  setJourneyStarted]  = useState(false)
+  const [journeyPan,      setJourneyPan]      = useState({ x: 0, y: 0 })
+  const [stages,          setStages]          = useState([])
+  const [selectedStageId, setSelectedStageId] = useState(null)
   const [form, setForm] = useState({
     name: '', internalIdentifier: '', journeyType: '',
     channelType: 'Internal', versionNotes: '', enableComments: false,
@@ -257,19 +263,90 @@ export default function SchemaForm() {
 
   const set = field => e => setForm(f => ({ ...f, [field]: e.target.value }))
 
+  const handleStart = () => {
+    setJourneyStarted(true)
+    setStages([newStage()])
+  }
+
+  const addStage = index => {
+    setStages(prev => [...prev.slice(0, index), newStage(), ...prev.slice(index)])
+  }
+
+  const deleteStage = id => {
+    setStages(prev => {
+      const next = prev.filter(s => s.id !== id)
+      if (next.length === 0) setJourneyStarted(false)
+      return next
+    })
+    setSelectedStageId(prev => prev === id ? null : prev)
+  }
+
+  const updateStageField = (id, field, value) =>
+    setStages(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s))
+
+  /* ── Export ── */
+  const handleExport = () => {
+    const payload = {
+      version: 1,
+      journey: {
+        pan: journeyPan,
+        stages: stages.map(({ id, title, description, datakey, processCompletionOrder }) => ({
+          id, title, description, datakey, processCompletionOrder,
+        })),
+      },
+    }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = 'journey-layout.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  /* ── Import ── */
+  const handleImportFile = e => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = evt => {
+      try {
+        const data = JSON.parse(evt.target.result)
+        const { stages: s = [], pan = { x: 0, y: 0 } } = data.journey ?? {}
+        setStages(s.map(st => ({
+          id:                     st.id ?? crypto.randomUUID(),
+          title:                  st.title ?? 'Stage',
+          description:            st.description ?? '',
+          datakey:                st.datakey ?? '',
+          processCompletionOrder: st.processCompletionOrder ?? 'Sequential',
+        })))
+        setJourneyStarted(s.length > 0)
+        setJourneyPan(pan)
+        setSelectedStageId(null)
+        setActiveTab('Journey')
+      } catch {
+        alert('Invalid journey JSON file.')
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
   return (
     <div className="sf-page">
 
       <div className="sf-topbar">
         <button className="sf-btn sf-btn--outline" disabled>SAVE</button>
         <button className="sf-btn sf-btn--outline" onClick={() => navigate('/management/journey/builder')}>RESET</button>
-        <button className="sf-btn sf-btn--solid">EXPORT</button>
+        <button className="sf-btn sf-btn--outline" onClick={() => importRef.current?.click()}>IMPORT</button>
+        <input ref={importRef} type="file" accept=".json,application/json"
+          style={{ display: 'none' }} onChange={handleImportFile} />
+        <button className="sf-btn sf-btn--solid" onClick={handleExport}>EXPORT</button>
       </div>
 
       <div className="sf-tabs">
         {TABS.map(tab => (
-          <button
-            key={tab}
+          <button key={tab}
             className={`sf-tab${activeTab === tab ? ' sf-tab--active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >{tab}</button>
@@ -279,16 +356,16 @@ export default function SchemaForm() {
       {/* always mounted so canvas state survives tab switches */}
       <JourneyCanvas
         started={journeyStarted}
-        onStart={() => setJourneyStarted(true)}
-        onDelete={() => { setJourneyStarted(false); setStageSelected(false) }}
+        onStart={handleStart}
         pan={journeyPan}
         setPan={setJourneyPan}
         hidden={activeTab !== 'Journey'}
-        stageTitle={stageTitle}
-        onStageTitleChange={setStageTitle}
-        stageSelected={stageSelected}
-        setStageSelected={setStageSelected}
-        stageId={stageId}
+        stages={stages}
+        selectedStageId={selectedStageId}
+        setSelectedStageId={setSelectedStageId}
+        onAddStage={addStage}
+        onDeleteStage={deleteStage}
+        onStageUpdate={updateStageField}
       />
 
       {activeTab === 'Details' ? (
@@ -327,8 +404,7 @@ export default function SchemaForm() {
               <textarea className="sf-textarea" value={form.versionNotes} onChange={set('versionNotes')} rows={3} />
             </div>
             <div className="sf-field sf-field--toggle">
-              <button
-                type="button" role="switch" aria-checked={form.enableComments}
+              <button type="button" role="switch" aria-checked={form.enableComments}
                 className={`sf-toggle${form.enableComments ? ' sf-toggle--on' : ''}`}
                 onClick={() => setForm(f => ({ ...f, enableComments: !f.enableComments }))}
               />

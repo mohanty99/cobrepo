@@ -843,6 +843,10 @@
 .sf-canvas-inner {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20px;
 }
 
 .sf-canvas-toolbar {
@@ -901,15 +905,18 @@
 }
 .sf-start-btn:hover { opacity: 0.88; }
 
-/* Stage row (+ [Stage] +) */
+/* Stage row (+ [Stage] ── [Stage] +) */
 .sf-stage-row {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: center;
+  gap: 4px;
+}
+
+.sf-connector {
+  width: 40px;
+  height: 2px;
+  background: #c0c5ce;
+  flex-shrink: 0;
 }
 
 .sf-stage-add {
