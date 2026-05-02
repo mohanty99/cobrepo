@@ -12,6 +12,7 @@ import UserGuide from './pages/UserGuide'
 import ManagementHome from './pages/management/ManagementHome'
 import ManagementSubPage from './pages/management/ManagementSubPage'
 import JourneyBuilder from './pages/management/journey/Builder'
+import SchemaForm from './pages/management/journey/SchemaForm'
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="management">
             <Route index element={<ManagementHome />} />
             <Route path="journey/builder" element={<JourneyBuilder />} />
+            <Route path="journey/new"     element={<SchemaForm />} />
             <Route path=":sectionId/:pageSlug" element={<ManagementSubPage />} />
           </Route>
         </Route>

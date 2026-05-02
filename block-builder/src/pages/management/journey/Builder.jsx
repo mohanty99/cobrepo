@@ -1,14 +1,20 @@
 import { useState, Fragment } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const SCHEMAS = [
   {
     id: 1, name: 'Agency Request (v11)', status: 'Published', type: 'Agency Request', lastPublished: '24/04/2026',
     versions: [
-      { label: 'v11 - Agency Request', status: 'Published', activeDates: '24/4/2026 – Present',   created: '24/4/2026', notes: 'Imported from smbc-emea-sdlc-dev (v14) b...' },
-      { label: 'v10 - Agency Request', status: 'Published', activeDates: '9/9/2025 – 24/4/2026',  created: '9/9/2025',  notes: 'Imported from smbc-emea-sdlc-dev (v12) b...' },
-      { label: 'v9 - Agency Request',  status: 'Published', activeDates: '19/3/2025 – 9/9/2025',  created: '19/3/2025', notes: 'Imported from smbc-emea-sdlc-dev (v11) b...' },
+      { label: 'v11 - Agency Request', status: 'Published', activeDates: '24/4/2026 – Present',  created: '24/4/2026', notes: 'Imported from smbc-emea-sdlc-dev (v14) b...' },
+      { label: 'v10 - Agency Request', status: 'Published', activeDates: '9/9/2025 – 24/4/2026', created: '9/9/2025',  notes: 'Imported from smbc-emea-sdlc-dev (v12) b...' },
+      { label: 'v9 - Agency Request',  status: 'Published', activeDates: '19/3/2025 – 9/9/2025', created: '19/3/2025', notes: 'Imported from smbc-emea-sdlc-dev (v11) b...' },
     ],
   },
+  // TODO: restore remaining 9 schemas
+]
+
+/*
+TEMPORARILY_REMOVED_SCHEMAS_START
   {
     id: 2, name: 'Bulk Upload (v11)', status: 'Published', type: 'Maintenance', lastPublished: '09/04/2026',
     versions: [
@@ -79,6 +85,8 @@ const SCHEMAS = [
     ],
   },
 ]
+TEMPORARILY_REMOVED_SCHEMAS_END
+*/
 
 function SearchIcon() {
   return (
@@ -158,6 +166,7 @@ function VersionsPanel({ schema }) {
 }
 
 export default function Builder() {
+  const navigate = useNavigate()
   const [search,   setSearch]   = useState('')
   const [selected, setSelected] = useState(new Set())
   const [expanded, setExpanded] = useState(new Set())
@@ -202,7 +211,7 @@ export default function Builder() {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <button className="jb-add-btn">
+          <button className="jb-add-btn" onClick={() => navigate('/management/journey/new')}>
             <PlusIcon /> ADD
           </button>
         </div>
