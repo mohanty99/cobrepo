@@ -828,3 +828,75 @@
   color: var(--text-dim);
   font-size: 13px;
 }
+
+/* Journey canvas */
+.sf-canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #f0f2f5;
+  cursor: grab;
+  user-select: none;
+}
+.sf-canvas--dragging { cursor: grabbing; }
+
+.sf-canvas-inner {
+  position: absolute;
+  inset: 0;
+}
+
+.sf-canvas-toolbar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d0d4da;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.sf-canvas-tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #5a6070;
+  transition: background 0.12s;
+}
+.sf-canvas-tool:hover { background: #f0f2f5; }
+
+.sf-canvas-tool-sep {
+  width: 1px;
+  height: 20px;
+  background: #d0d4da;
+  margin: 0 2px;
+}
+
+.sf-start-btn {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 16px;
+  background: #4a6fa5;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.sf-start-btn:hover { opacity: 0.88; }
