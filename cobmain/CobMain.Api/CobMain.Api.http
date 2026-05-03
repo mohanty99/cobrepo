@@ -1,0 +1,6 @@
+@CobMain.Api_HostAddress = http://localhost:5063
+
+GET {{CobMain.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,1 @@
+When a new instruction is started, remove previously built up context to save tokens.

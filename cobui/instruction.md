@@ -1,0 +1,1 @@
+Whenever new information surfaces during a session, the relevant `.md` file must be updated. Don't let the facts slip through.
