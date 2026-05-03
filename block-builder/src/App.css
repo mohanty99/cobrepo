@@ -988,16 +988,24 @@
   margin-bottom: 8px;
   letter-spacing: .03em;
 }
+.sf-process { overflow: visible; }
+
+.sf-task-outer {
+  position: relative;
+  margin-top: 6px;
+}
 .sf-task {
   display: flex;
   align-items: center;
   gap: 8px;
   background: #fff;
-  border: 1px solid #c8ccd2;
+  border: 1.5px solid #c8ccd2;
   border-radius: 4px;
   padding: 8px 12px;
   cursor: pointer;
+  transition: border-color 0.15s;
 }
+.sf-task--selected { border-color: #4a90d9; }
 .sf-task__dot {
   width: 22px;
   height: 22px;
@@ -1008,6 +1016,51 @@
 .sf-task__name {
   font-size: 13px;
   color: #3a4152;
+  flex: 1;
+}
+.sf-task__delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  color: #8a909e;
+  cursor: pointer;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+.sf-task__delete:hover { background: #f0d4d4; color: #c0392b; }
+
+/* vertical + buttons beside selected task */
+.sf-task-add-vert {
+  position: absolute;
+  right: -34px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1.5px solid #4a90d9;
+  border-radius: 4px;
+  color: #4a90d9;
+  cursor: pointer;
+  transition: background 0.12s;
+  z-index: 5;
+}
+.sf-task-add-vert:hover { background: #eaf2fb; }
+.sf-task-add-vert--above { top: 0; }
+.sf-task-add-vert--below { bottom: 0; }
+
+/* Task Content section header in properties panel */
+.sf-props-section {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d3344;
+  margin: 16px 0 10px;
 }
 
 /* Stage Properties side panel */
